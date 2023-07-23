@@ -48,5 +48,30 @@ module.exports = {
 
 		// Show the modal to the user
 		await interaction.showModal(modal);
+
+		try {
+			const modalResponse = await interaction.awaitModalSubmit({
+				time: 60_000, filter: (i) =>
+					i.customId === "myModal" &&
+					i.user.id === interaction.user.id
+			})
+
+			if (modalResponse.isModalSubmit()) {
+				const favoriteColor = modalResponse.fields.getTextInputValue('favoriteColorInput');
+				const hobbies = modalResponse.fields.getTextInputValue('hobbiesInput');
+
+				await modalResponse.reply({
+					content: `Your submission was received successfully. Thank you for your submission! Your favorite color: ${favoriteColor} Your hobbies: ${hobbies}.`,
+					ephemeral: true,
+				});
+			}
+		} catch (error) {
+			console.error(error);
+			await interaction.reply({
+				content: `An error occurred while creating your ${ticketType} ticket. Please try again later.`,
+				embeds: [],
+				components: [],
+			});
+		}
 	},
 };

@@ -7,7 +7,7 @@ module.exports = {
 		// When the client is ready, run this code (only once)
 		// We use 'c' for the event parameter to keep it separate from the already defined 'client'
 		client.user.setStatus('online');
-		client.user.setUsername('nicebot');
+		client.user.setUsername('noobbot');
 
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 	},

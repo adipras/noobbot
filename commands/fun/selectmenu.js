@@ -1,4 +1,5 @@
 const { ActionRowBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SlashCommandBuilder, ComponentType } = require('discord.js');
+const wait = require('node:timers/promises').setTimeout;
 
 module.exports = {
 	cooldown: 5,
@@ -57,11 +58,22 @@ module.exports = {
 			components: [row],
 		});
 
+		// const collectorFilter = i => {
+		// 	// i.deferUpdate();
+		// 	return i.user.id === interaction.user.id;
+		// };
+
+		// response.awaitMessageComponent({ filter: collectorFilter, componentType: ComponentType.StringSelect, time: 60000 })
+		// 	.then(interaction => interaction.editReply(`You selected ${interaction.values.join(', ')}!`))
+		// 	.catch(err => console.log('No interactions were collected. ' + err));
+
 		const collector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000 });
 
 		collector.on('collect', async i => {
+			await i.deferUpdate();
+			await wait(4000);
 			const selection = i.values.join();
-			await i.reply(`${i.user} has selected ${selection}!`);
+			await i.editReply(`${i.user} has selected ${selection}!`);
 		});
 	},
 };

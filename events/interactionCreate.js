@@ -25,7 +25,6 @@ module.exports = {
 			// respond to the select menu
 		} else if (interaction.isModalSubmit()) {
 			console.log(interaction);
-			await interaction.reply({ content: 'Your submission was received successfully!' });
 			// respond to the select menu
 		}
 	},

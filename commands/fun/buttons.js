@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, ComponentType } = require('discord.js');
 
 module.exports = {
 	cooldown: 5,
@@ -57,30 +57,45 @@ module.exports = {
 			.setLabel('Emoji')
 			.setStyle(ButtonStyle.Primary)
 
+		let response;
 		if (interaction.options.getSubcommand() === 'styling') {
 			const row = new ActionRowBuilder()
 				.addComponents(buttonPrimary, buttonSecondary, buttonSuccess, buttonDanger, buttonEmoji);
 
-			await interaction.reply({
+			response = await interaction.reply({
 				content: `Buttons style example `,
 				components: [row],
 			});
 		} else if (interaction.options.getSubcommand() === 'disabled') {
-			const row = new ActionRowBuilder()
+			row = new ActionRowBuilder()
 				.addComponents(buttonDisabled);
 
-			await interaction.reply({
+			response = await await interaction.reply({
 				content: `Button disbled example `,
 				components: [row],
 			});
 		} else if (interaction.options.getSubcommand() === 'link') {
-			const row = new ActionRowBuilder()
+			row = new ActionRowBuilder()
 				.addComponents(buttonLink);
 
-			await interaction.reply({
+			response = await await interaction.reply({
 				content: `Button Link example `,
 				components: [row],
 			});
 		}
+
+		const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 15000 });
+
+		collector.on('collect', i => {
+			if (i.user.id === interaction.user.id) {
+				i.reply(`${i.user.id} clicked on the ${i.customId} button.`);
+			} else {
+				i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+			}
+		});
+
+		collector.on('end', collected => {
+			console.log(`Collected ${collected.size} interactions.`);
+		});
 	},
 };

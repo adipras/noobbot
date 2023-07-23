@@ -15,7 +15,7 @@ const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
     const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
@@ -28,79 +28,79 @@ for (const folder of commandFolders) {
     }
 }
 
-client.once(Events.ClientReady, () => {
-    console.log(`Ready! Logged in as ${client.user.tag}`);
-});
+// client.once(Events.ClientReady, () => {
+//     console.log(`Ready! Logged in as ${client.user.tag}`);
+// });
 
-client.on(Events.InteractionCreate, async interaction => {
-    if (interaction.channelId !== channelId) return interaction.reply({ content: `Sorry, the message you send can only get a response on the "Noobbot" channel.`});
+// client.on(Events.InteractionCreate, async interaction => {
+//     if (interaction.channelId !== channelId) return interaction.reply({ content: `Sorry, the message you send can only get a response on the "Noobbot" channel.`});
 
-    if (interaction.isChatInputCommand()) {
+//     if (interaction.isChatInputCommand()) {
 
-        const command = client.commands.get(interaction.commandName);
-    
-        if (!command) return;
-    
-        const { cooldowns } = client;
-    
-        if (!cooldowns.has(command.data.name)) {
-            cooldowns.set(command.data.name, new Collection());
-        }
-    
-        const now = Date.now();
-        const timestamps = cooldowns.get(command.data.name);
-        const defaultCooldownDuration = 3;
-        const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
-    
-        if (timestamps.has(interaction.user.id)) {
-            const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
-    
-            if (now < expirationTime) {
-                const expiredTimestamp = Math.round(expirationTime / 1000);
-                return interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
-            }
-        }
-    
-        timestamps.set(interaction.user.id, now);
-        setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
-    
-        try {
-            await command.execute(interaction);
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-        }
-    } else if (interaction.isAutocomplete()) {
-		const command = interaction.client.commands.get(interaction.commandName);
+//         const command = client.commands.get(interaction.commandName);
 
-		if (!command) {
-			console.error(`No command matching ${interaction.commandName} was found.`);
-			return;
-		}
+//         if (!command) return;
 
-		try {
-			await command.autocomplete(interaction);
-		} catch (error) {
-			console.error(error);
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-	} else {
-        return;
-    }
-});
+//         const { cooldowns } = client;
 
-// const eventsPath = path.join(__dirname, 'events');
-// const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+//         if (!cooldowns.has(command.data.name)) {
+//             cooldowns.set(command.data.name, new Collection());
+//         }
 
-// for (const file of eventFiles) {
-// 	const filePath = path.join(eventsPath, file);
-// 	const event = require(filePath);
-// 	if (event.once) {
-// 		client.once(event.name, (...args) => event.execute(...args));
+//         const now = Date.now();
+//         const timestamps = cooldowns.get(command.data.name);
+//         const defaultCooldownDuration = 3;
+//         const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
+
+//         if (timestamps.has(interaction.user.id)) {
+//             const expirationTime = timestamps.get(interaction.user.id) + cooldownAmount;
+
+//             if (now < expirationTime) {
+//                 const expiredTimestamp = Math.round(expirationTime / 1000);
+//                 return interaction.reply({ content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`, ephemeral: true });
+//             }
+//         }
+
+//         timestamps.set(interaction.user.id, now);
+//         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
+
+//         try {
+//             await command.execute(interaction);
+//         } catch (error) {
+//             console.error(error);
+//             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+//         }
+//     } else if (interaction.isAutocomplete()) {
+// 		const command = interaction.client.commands.get(interaction.commandName);
+
+// 		if (!command) {
+// 			console.error(`No command matching ${interaction.commandName} was found.`);
+// 			return;
+// 		}
+
+// 		try {
+// 			await command.autocomplete(interaction);
+// 		} catch (error) {
+// 			console.error(error);
+//             await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+// 		}
 // 	} else {
-// 		client.on(event.name, (...args) => event.execute(...args));
-// 	}
-// }
+//         return;
+//     }
+// });
+
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+    const filePath = path.join(eventsPath, file);
+    const event = require(filePath);
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args));
+    } else {
+        client.on(event.name, (...args) => event.execute(...args));
+    }
+}
 
 // Log in to Discord with your client's token
 client.login(token);
